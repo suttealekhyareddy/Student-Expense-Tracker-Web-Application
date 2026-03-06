@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Student Expense Tracker</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6fb;
+margin:0;
+}
+
+header{
+background:#4a6cf7;
+color:white;
+padding:20px;
+text-align:center;
+}
+
+.container{
+width:80%;
+margin:auto;
+margin-top:20px;
+}
+
+.box{
+background:white;
+padding:20px;
+margin-bottom:20px;
+border-radius:10px;
+box-shadow:0px 0px 10px #ccc;
+}
+
+input,select,button{
+padding:10px;
+margin:5px;
+width:200px;
+}
+
+button{
+background:#4a6cf7;
+color:white;
+border:none;
+cursor:pointer;
+}
+
+button:hover{
+background:#2e4ad7;
+}
+
+.deleteBtn{
+background:red;
+}
+
+.updateBtn{
+background:orange;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+th,td{
+border:1px solid #ccc;
+padding:10px;
+text-align:center;
+}
+
+.summary{
+font-size:18px;
+font-weight:bold;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Student Expense Tracker</h1>
+<p>Track your pocket money and expenses</p>
+</header>
+
+<div class="container">
+
+<!-- POCKET MONEY -->
+
+<div class="box">
+
+<h2>Add Pocket Money</h2>
+
+<input type="number" id="income" placeholder="Enter Pocket Money">
+
+<button onclick="addIncome()">Add Money</button>
+
+<table>
+
+<tr>
+<th>Pocket Money</th>
+<th>Update</th>
+<th>Delete</th>
+</tr>
+
+<tbody id="incomeList"></tbody>
+
+</table>
+
+</div>
+
+
+<!-- EXPENSE -->
+
+<div class="box">
+
+<h2>Add Expense</h2>
+
+<input type="text" id="desc" placeholder="Where you spent money">
+
+<select id="category">
+<option>Food</option>
+<option>Travel</option>
+<option>Books</option>
+<option>Shopping</option>
+<option>Entertainment</option>
+<option>Other</option>
+</select>
+
+<input type="number" id="amount" placeholder="Amount Spent">
+
+<button onclick="addExpense()">Add Expense</button>
+
+</div>
+
+
+<!-- SUMMARY -->
+
+<div class="box">
+
+<h2>Summary</h2>
+
+<p class="summary">Total Pocket Money: ₹ <span id="totalIncome">0</span></p>
+
+<p class="summary">Total Expense: ₹ <span id="totalExpense">0</span></p>
+
+<p class="summary">Remaining Balance: ₹ <span id="balance">0</span></p>
+
+</div>
+
+
+<!-- EXPENSE HISTORY -->
+
+<div class="box">
+
+<h2>Expense History</h2>
+
+<table>
+
+<tr>
+<th>Description</th>
+<th>Category</th>
+<th>Amount</th>
+<th>Delete</th>
+</tr>
+
+<tbody id="list"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+<script>
+
+let incomes=[];
+let expenses=[];
+
+let totalIncome=0;
+let totalExpense=0;
+
+
+// ADD POCKET MONEY
+
+function addIncome(){
+
+let money=parseInt(document.getElementById("income").value);
+
+if(isNaN(money)){
+alert("Enter pocket money");
+return;
+}
+
+incomes.push(money);
+
+renderIncome();
+
+document.getElementById("income").value="";
+
+}
+
+
+// DISPLAY POCKET MONEY
+
+function renderIncome(){
+
+let table=document.getElementById("incomeList");
+table.innerHTML="";
+
+totalIncome=0;
+
+for(let i=0;i<incomes.length;i++){
+
+totalIncome+=incomes[i];
+
+let row="<tr>"
++"<td>₹ "+incomes[i]+"</td>"
++"<td><button class='updateBtn' onclick='updateIncome("+i+")'>Update</button></td>"
++"<td><button class='deleteBtn' onclick='deleteIncome("+i+")'>Delete</button></td>"
++"</tr>";
+
+table.innerHTML+=row;
+
+}
+
+document.getElementById("totalIncome").innerText=totalIncome;
+
+updateBalance();
+
+}
+
+
+// UPDATE POCKET MONEY
+
+function updateIncome(index){
+
+let newMoney=prompt("Enter new pocket money",incomes[index]);
+
+if(newMoney!=null && !isNaN(newMoney)){
+
+incomes[index]=parseInt(newMoney);
+
+renderIncome();
+
+}
+
+}
+
+
+// DELETE POCKET MONEY
+
+function deleteIncome(index){
+
+incomes.splice(index,1);
+
+renderIncome();
+
+}
+
+
+// ADD EXPENSE
+
+function addExpense(){
+
+let desc=document.getElementById("desc").value;
+let category=document.getElementById("category").value;
+let amount=parseInt(document.getElementById("amount").value);
+
+if(desc=="" || isNaN(amount)){
+alert("Enter expense details");
+return;
+}
+
+let obj={
+desc:desc,
+category:category,
+amount:amount
+};
+
+expenses.push(obj);
+
+renderExpenses();
+
+document.getElementById("desc").value="";
+document.getElementById("amount").value="";
+
+}
+
+
+// DISPLAY EXPENSES
+
+function renderExpenses(){
+
+let table=document.getElementById("list");
+table.innerHTML="";
+
+totalExpense=0;
+
+for(let i=0;i<expenses.length;i++){
+
+let e=expenses[i];
+
+totalExpense+=e.amount;
+
+let row="<tr>"
++"<td>"+e.desc+"</td>"
++"<td>"+e.category+"</td>"
++"<td>₹ "+e.amount+"</td>"
++"<td><button class='deleteBtn' onclick='deleteExpense("+i+")'>Delete</button></td>"
++"</tr>";
+
+table.innerHTML+=row;
+
+}
+
+document.getElementById("totalExpense").innerText=totalExpense;
+
+updateBalance();
+
+}
+
+
+// DELETE EXPENSE
+
+function deleteExpense(index){
+
+expenses.splice(index,1);
+
+renderExpenses();
+
+}
+
+
+// BALANCE
+
+function updateBalance(){
+
+let balance=totalIncome-totalExpense;
+
+document.getElementById("balance").innerText=balance;
+
+}
+
+</script>
+
+</body>
+</html>
